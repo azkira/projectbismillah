@@ -8,6 +8,13 @@ use App\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Gate;
+use App\IlluminateDatabaseEloquentModel;
+use App\KyslikColumnSortableSortable;
+use Illuminate\Support\Facades\Redirect;
+use Image;
+use Auth;
+use App\Post;
+
 
 class BooksController extends Controller
 {
@@ -17,7 +24,7 @@ class BooksController extends Controller
             return redirect(route('login'));
         }
 
-        $books = DB::table('books')->where('type', 'novel')->get();
+        $books = DB::table('books')->where('type', 'novel')->orderBy('created_at', 'desc')->get();
         return view('novels', ['books' => $books]);
     }
 
@@ -27,8 +34,8 @@ class BooksController extends Controller
             return redirect(route('login'));
         }
 
-        $books = DB::table('books')->where('type', 'comic')->get();
-        return view('philosophy',  ['books' => $books]);
+        $books = DB::table('books')->where('type', 'comic')->orderBy('created_at', 'desc')->get();
+        return view('comics',  ['books' => $books]);
     }
 
     public function philosophy()
@@ -37,7 +44,7 @@ class BooksController extends Controller
             return redirect(route('login'));
         }
 
-        $books = DB::table('books')->where('type', 'philosophy')->get();
+        $books = DB::table('books')->where('type', 'philosophy')->orderBy('created_at', 'desc')->get();
         return view('philosophy',  ['books' => $books]);
     }
 
@@ -47,7 +54,7 @@ class BooksController extends Controller
         if (Gate::denies('access-book')) {
             return redirect(route('login'));
         }
-        $books = DB::table('books')->where('type', 'psychology')->get();
+        $books = DB::table('books')->where('type', 'psychology')->orderBy('created_at', 'desc')->get();
         return view('psychology',  ['books' => $books]);
     }
 
@@ -84,9 +91,62 @@ class BooksController extends Controller
         return view('search', ['books' => $books]);
     }
 
-    public function sort(Request $request)
+    public function sortsearch(Request $request)
     {
         if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $search = $request->search;
+
+        $books = DB::table('books')
+            ->orderBy('title')
+            ->where('title', 'like', "%" . $search . "%")
+            ->orWhere('author', 'like', "%" . $search . "%")
+            ->orWhere('publisher', 'like', "%" . $search . "%")
+            ->orWhere('type', 'like', "%" . $search . "%")
+            ->paginate();
+        return view('sortsearch', compact('search'));
+        //return view('search', ['books' => $books]);
+    }
+
+    public function sorthome(Request $request)
+    {
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->orderBy('title')->paginate();
+
+        return view('home')->with('books', $books);
+    }
+
+    public function sorthomedesc(Request $request)
+    {
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->orderBy('title', 'DESC')->paginate();
+
+        return view('home')->with('books', $books);
+    }
+
+    public function sortcomic(Request $request)
+    {
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'comic')->orderBy('title')->paginate();
+
+        return view('comics')->with('books', $books);
+    }
+
+    public function sortcomicdesc(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
             return redirect(route('login'));
         }
 
@@ -94,6 +154,140 @@ class BooksController extends Controller
             ->orderBy('title')->paginate();
 
         return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'comic')->orderBy('title', 'DESC')->paginate();
+
+        return view('comics')->with('books', $books);
+    }
+
+    public function sortphilosophy(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'philosophy')->orderBy('title')->paginate();
+
+        return view('philosophy')->with('books', $books);
+    }
+
+    public function sortphilosophydesc(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'philosophy')->orderBy('title', 'DESC')->paginate();
+
+        return view('philosophy')->with('books', $books);
+    }
+
+    public function sortpsychology(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'psychology')->orderBy('title')->paginate();
+
+        return view('psychology')->with('books', $books);
+    }
+
+    public function sortpsychologydesc(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'psychology')->orderBy('title', 'DESC')->paginate();
+
+        return view('psychology')->with('books', $books);
+    }
+
+    public function sortnovel(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'novel')->orderBy('title')->paginate();
+
+        return view('novels')->with('books', $books);
+    }
+
+    public function sortnoveldesc(Request $request)
+    {
+        /*
+            if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')
+            ->orderBy('title')->paginate();
+
+        return view('sort', ['books' => $books]);
+        */
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $books = DB::table('books')->where('type', 'novel')->orderBy('title', 'DESC')->paginate();
+
+        return view('novels')->with('books', $books);
     }
 
     /**
@@ -123,13 +317,31 @@ class BooksController extends Controller
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show(Book $book, Request $request)
     {
         if (Gate::denies('access-book')) {
             return redirect(route('login'));
         }
 
-        return view('show', compact('book'));
+        $reviews = DB::table('reviews')->where('which_book', $book->id)->get();
+
+        return view('show')->with(compact('book'))->with('reviews', $reviews);
+    }
+
+    public function addReview(Request $request)
+    {
+        if (Gate::denies('access-book')) {
+            return redirect(route('login'));
+        }
+
+        $data = $request->all();
+        $reviews = new Review();
+        $reviews->person_name = Auth::user()->name;
+        $reviews->review_content = $data['InputReview'];
+        $reviews->which_book = $data['InputWhich'];
+        $reviews->save();
+        $request->session()->flash('success', $reviews->title . ' Comment has been updated');
+        return redirect()->back();
     }
 
     /**
@@ -164,5 +376,10 @@ class BooksController extends Controller
     public function destroy(Book $book)
     {
         //
+    }
+
+    public function addbook(Request $request)
+    {
+        return view('user.addbook',  ['user' => Auth::user()]);
     }
 }

@@ -20,6 +20,8 @@ class CreateBooksTable extends Migration
             $table->string('publisher');
             $table->longText('synopsis');
             $table->string('type');
+            $table->string('image');
+            $table->string('pdf');
             $table->timestamps();
         });
     }

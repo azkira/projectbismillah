@@ -40,5 +40,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('access-book', function ($user) {
             return $user->hasAnyRoles(['admin', 'author', 'user']);
         });
+
+        Gate::define('delete-book', function ($user) {
+            return $user->hasAnyRoles(['admin', 'author']);
+        });
     }
 }

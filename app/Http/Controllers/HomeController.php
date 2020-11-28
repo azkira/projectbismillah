@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\DB;
 use App\Book;
 use App\Review;
 use App\Role;
@@ -28,9 +30,15 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        $books = Book::all();
+        $books = DB::table('books')->orderBy('created_at', 'desc')->get();
         return view('home', ['books' => $books]);
     }
+
+    public function reviews(Request $request)
+    {
+        return view('reviews');
+    }
+    /*
 
     public function showReview(Request $request)
     {
@@ -42,4 +50,5 @@ class HomeController extends Controller
     {
         $reviews = DB::table('reviews')->get();
     }
+    */
 }

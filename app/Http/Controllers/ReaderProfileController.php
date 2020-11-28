@@ -7,6 +7,8 @@ use App\User;
 use App\Role;
 use Image;
 use Auth;
+use Book;
+use Illuminate\Support\Facades\DB;
 
 class ReaderProfileController extends Controller
 {
@@ -22,7 +24,9 @@ class ReaderProfileController extends Controller
     }
     public function profile()
     {
-        return view('user.profile', array('user' => Auth::user()));
+        $books = DB::table('books')->where('author', Auth::user()->name)->get();
+
+        return view('user.profile')->with(['user' => Auth::user()])->with('books', $books);
     }
     public function update_avatar(Request $request)
     {
@@ -36,7 +40,7 @@ class ReaderProfileController extends Controller
             $user->avatar = $filename;
 
             if ($user->save()) {
-                $request->session()->flash('success', $user->name . ' PP has been updated');
+                $request->session()->flash('success', $user->name . ' Profile Picture has been updated');
             } else {
                 $request->session()->flash('error', 'Error');
             }
@@ -45,5 +49,9 @@ class ReaderProfileController extends Controller
         }
 
         return view('user.profile', ['user' => Auth::user()]);
+    }
+    public function destroy(Book $book)
+    {
+        return $book;
     }
 }

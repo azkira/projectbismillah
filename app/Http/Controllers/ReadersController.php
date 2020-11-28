@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Reader;
 use App\User;
+use App\Book;
 use Illuminate\Http\Request;
 use Symfony\Component\VarDumper\Caster\RedisCaster;
 
@@ -97,8 +98,9 @@ class ReadersController extends Controller
      * @param  \App\Reader  $reader
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Reader $reader)
+    public function destroy(Book $book)
     {
-        //
+        Book::destroy($book->id);
+        return redirect()->back();
     }
 }
